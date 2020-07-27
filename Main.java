@@ -3,22 +3,27 @@ public class Main {
     public static void main(String [] args) {
         final int base;
         final int startPower;
+        final int concatPowerLimit;
         final int powerLimit;
 
-        if(args.length >= 3) {
+        if(args.length >= 4) {
             base = Integer.parseInt(args[0]);
             startPower = Integer.parseInt(args[1]);
-            powerLimit = Integer.parseInt(args[2]);
+            concatPowerLimit = Integer.parseInt(args[2]);
+            powerLimit = Integer.parseInt(args[3]);
         } else {
             base = 2;
             startPower = 1;
+            concatPowerLimit = 21; // at least 2 hours to compute the 22nd one
             powerLimit = 27;
         }
 
         for(int power = startPower; power <= 27; power++) {
             int size = (int)Math.pow(2, power);
             runStringBuilderExperiment(base, power, size);
-            runConcatExperiment(base, power, size);
+            if (power <= concatPowerLimit) {
+                runConcatExperiment(base, power, size);
+            }
         }
     }
 
