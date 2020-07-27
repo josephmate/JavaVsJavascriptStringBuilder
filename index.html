@@ -1,7 +1,79 @@
 <html>
+    <head>
+        
+        <script>
+            function runConcatExperiment(size) {
+                var result = "";
+                var start = new Date().getTime();
+                for (var i = 0; i < size; i++) {
+                    result += (i%10);
+                }
+                var end = new Date().getTime();
+                var duration = end - start;
+                console.log("concat %d %d %d", size, result.length, duration);
+                return duration;
+            }
+
+            function runArrayJoinExperiment(size) {
+                var builder = [];
+                var start = new Date().getTime();
+                for (var i = 0; i < size; i++) {
+                    builder.push(i%10);
+                }
+                var result = builder.join();
+                var end = new Date().getTime();
+                var duration = end - start;
+                console.log("concat %d %d %d", size, result.length, duration);
+                return duration;
+            }
+            
+            function addRow(base, power, size, concatDuration, arrayJoinDuration) {
+                var resultsTable = document.getElementById("results");
+                var tableRow = document.createElement("tr");
+                var powerCell = document.createElement("td");
+                powerCell.innerText = base + "^" + power;
+                tableRow.append(powerCell);
+                var sizeCell = document.createElement("td");
+                sizeCell.innerText = size;
+                tableRow.append(sizeCell);
+                var concatCell  = document.createElement("td");
+                concatCell.innerText = concatDuration;
+                tableRow.append(concatCell);
+                var joinCell  = document.createElement("td");
+                joinCell.innerText = arrayJoinDuration;
+                tableRow.append(joinCell);
+                resultsTable.appendChild(tableRow);
+            }
+            
+            function runExperiment() {
+                var baseInput = document.getElementById("base");
+                var base = baseInput.value;
+                var powerLimitInput = document.getElementById("powerLimit");
+                var powerLimit = powerLimitInput.value;
+                for(var power = 1; power <= powerLimit; power++) {
+                    var size = Math.pow(2, power);
+                    var concatDuration = runConcatExperiment(size);
+                    var arrayJoinDuration = runArrayJoinExperiment(size);
+                    addRow(base, power, size, concatDuration, arrayJoinDuration);
+                }
+            }
+        </script>
+    </head>
     <body>
+        <p>Calculate results for up to
+            <input id="base" type="text" value="2"> to the power of <input id="powerLimit" type="text" value="27"> concats.
+            <button onclick="runExperiment()">Run!</button></p>
+        <p>You might get a popup about the page being slow. You need to click wait. </p>
+        <p>On Chrome Version 84.0.4147.89 (Official Build) (64-bit) I was able to do 2^27 before the browser ran out of memory. </p>
+        <p>I even tried increasing the js heap limit and that did not help: https://bugs.chromium.org/p/v8/issues/detail?id=847 recommends opening chrome with  -args --js-flags="--max_old_space_size=8192"
+            after experimenting with it a bit, the command will look like:
+            "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" -args --js-flags="--max_old_space_size=8192" from a command prompt.
+            You can confirm by opening developer tools console and running console.memory and your jsHeapSizeLimit should be larger than without the flag.
+        </p>
+        <p>On Firefox 78.0.2 (64-bit) I was also able to to do 2^27 before the browser ran out of memory.</p>
         <table id="results">
             <thead>
+                <th># concats</th>
                 <th># concats</th>
                 <th>String conat</th>
                 <th>Array.join</th>
