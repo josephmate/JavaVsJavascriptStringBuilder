@@ -61,10 +61,10 @@
     </head>
     <body>
         <p>Calculate results for up to
-            <input id="base" type="text" value="2"> to the power of <input id="powerLimit" type="text" value="27"> concats.
+            <input id="base" type="text" value="2"> to the power of <input id="powerLimit" type="text" value="26"> concats.
             <button onclick="runExperiment()">Run!</button></p>
         <p>You might get a popup about the page being slow. You need to click wait. </p>
-        <p>On Chrome Version 84.0.4147.89 (Official Build) (64-bit) I was able to do 2^27 before the browser ran out of memory. </p>
+        <p>On Chrome Version 84.0.4147.89 (Official Build) (64-bit) I was able to do 2^26 before the browser ran out of memory. </p>
         <p>I even tried increasing the js heap limit and that did not help: https://bugs.chromium.org/p/v8/issues/detail?id=847 recommends opening chrome with  -args --js-flags="--max_old_space_size=8192"
             after experimenting with it a bit, the command will look like:
             "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" -args --js-flags="--max_old_space_size=8192" from a command prompt.

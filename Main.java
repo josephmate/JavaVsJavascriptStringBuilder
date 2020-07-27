@@ -1,14 +1,25 @@
 public class Main {
 
     public static void main(String [] args) {
-        for(int power = 1; power <= 10; power++) {
-            int size = (int)Math.pow(10, power);
-            runConcatExperiment(size);
-            runStringBuilderExperiment(size);
+        final int base;
+        final int powerLimit;
+
+        if(args.length >= 2) {
+            base = Integer.parseInt(args[0]);
+            powerLimit = Integer.parseInt(args[1]);
+        } else {
+            base = 2;
+            powerLimit = 27;
+        }
+
+        for(int power = 1; power <= 27; power++) {
+            int size = (int)Math.pow(2, power);
+            runConcatExperiment(base, power, size);
+            runStringBuilderExperiment(base, power, size);
         }
     }
 
-    public static void runConcatExperiment(int size) {
+    public static void runConcatExperiment(int base, int power, int size) {
         String result = "";
         long start = System.currentTimeMillis();
         for (int i = 0; i < size; i++) {
@@ -16,10 +27,10 @@ public class Main {
         }
         long end = System.currentTimeMillis();
         long duration = end - start;
-        System.out.println(String.format("concat %d %d %d", size, result.length(), duration));
+        System.out.println(String.format("concat %d^%d %d %d %d", base, power, size, result.length(), duration));
     }
 
-    public static void runStringBuilderExperiment(int size) {
+    public static void runStringBuilderExperiment(int base, int power, int size) {
         StringBuilder builder = new StringBuilder();
         long start = System.currentTimeMillis();
         for (int i = 0; i < size; i++) {
@@ -28,7 +39,7 @@ public class Main {
         String result = builder.toString();
         long end = System.currentTimeMillis();
         long duration = end - start;
-        System.out.println(String.format("builder %d %d %d", size, result.length(), duration));
+        System.out.println(String.format("builder %d^%d %d %d %d", base, power, size, result.length(), duration));
     }
 
 }
