@@ -2,20 +2,23 @@ public class Main {
 
     public static void main(String [] args) {
         final int base;
+        final int startPower;
         final int powerLimit;
 
-        if(args.length >= 2) {
+        if(args.length >= 3) {
             base = Integer.parseInt(args[0]);
-            powerLimit = Integer.parseInt(args[1]);
+            startPower = Integer.parseInt(args[1]);
+            powerLimit = Integer.parseInt(args[2]);
         } else {
             base = 2;
+            startPower = 1;
             powerLimit = 27;
         }
 
-        for(int power = 1; power <= 27; power++) {
+        for(int power = startPower; power <= 27; power++) {
             int size = (int)Math.pow(2, power);
-            runConcatExperiment(base, power, size);
             runStringBuilderExperiment(base, power, size);
+            runConcatExperiment(base, power, size);
         }
     }
 

@@ -1,2 +1,2 @@
 javac Main.java
-java Main
+java Main $args[0] $args[1] $args[2]
