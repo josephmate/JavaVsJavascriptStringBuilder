@@ -1,4 +1,4 @@
-function runConcatExperiment(size) {
+function runConcatExperiment(base, power, size) {
     var result = "";
     var start = new Date().getTime();
     for (var i = 0; i < size; i++) {
@@ -6,11 +6,11 @@ function runConcatExperiment(size) {
     }
     var end = new Date().getTime();
     var duration = end - start;
-    console.log("concat %d %d %d", size, result.length, duration);
+    console.log("concat %d^%d %d %d %d", base, power, size, result.length, duration);
     return duration;
 }
 
-function runArrayJoinExperiment(size) {
+function runArrayJoinExperiment(base, power, size) {
     var builder = [];
     var start = new Date().getTime();
     for (var i = 0; i < size; i++) {
@@ -19,20 +19,16 @@ function runArrayJoinExperiment(size) {
     var result = builder.join();
     var end = new Date().getTime();
     var duration = end - start;
-    console.log("concat %d %d %d", size, result.length, duration);
+    console.log("join %d^%d %d %d %d", base, power, size, result.length, duration);
     return duration;
 }
 
-function runExperiment() {
-    var baseInput = document.getElementById("base");
-    var base = baseInput.value;
-    var powerLimitInput = document.getElementById("powerLimit");
-    var powerLimit = powerLimitInput.value;
+function runExperiment(base, powerLimit) {
     var results = [];
     for(var power = 1; power <= powerLimit; power++) {
         var size = Math.pow(2, power);
-        var concatDuration = runConcatExperiment(size);
-        var arrayJoinDuration = runArrayJoinExperiment(size);
+        var concatDuration = runConcatExperiment(base, power, size);
+        var arrayJoinDuration = runArrayJoinExperiment(base, power, size);
         results.push({
             base: base,
             power: power, 
@@ -43,3 +39,10 @@ function runExperiment() {
     }
     return results;
 }
+
+module.exports = {
+    run: function (base, powerLimit) {
+        runExperiment(base, powerLimit);
+    }
+};
+  

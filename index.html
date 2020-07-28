@@ -25,7 +25,7 @@
                 var base = baseInput.value;
                 var powerLimitInput = document.getElementById("powerLimit");
                 var powerLimit = powerLimitInput.value;
-                var results = runExperiment(base, powerLimitInput, powerLimit);
+                var results = runExperiment(base, powerLimit);
                 results.forEach(function(result){
                     addRow(result.base, result.power, result.size, result.concatDuration, result.arrayJoinDuration);
                 });
