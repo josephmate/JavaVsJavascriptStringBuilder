@@ -1,32 +1,7 @@
 <html>
     <head>
-        
+        <script src="experiment.js"></script>
         <script>
-            function runConcatExperiment(size) {
-                var result = "";
-                var start = new Date().getTime();
-                for (var i = 0; i < size; i++) {
-                    result += (i%10);
-                }
-                var end = new Date().getTime();
-                var duration = end - start;
-                console.log("concat %d %d %d", size, result.length, duration);
-                return duration;
-            }
-
-            function runArrayJoinExperiment(size) {
-                var builder = [];
-                var start = new Date().getTime();
-                for (var i = 0; i < size; i++) {
-                    builder.push(i%10);
-                }
-                var result = builder.join();
-                var end = new Date().getTime();
-                var duration = end - start;
-                console.log("concat %d %d %d", size, result.length, duration);
-                return duration;
-            }
-            
             function addRow(base, power, size, concatDuration, arrayJoinDuration) {
                 var resultsTable = document.getElementById("results");
                 var tableRow = document.createElement("tr");
@@ -45,24 +20,22 @@
                 resultsTable.appendChild(tableRow);
             }
             
-            function runExperiment() {
+            function runBrowserExperiment() {
                 var baseInput = document.getElementById("base");
                 var base = baseInput.value;
                 var powerLimitInput = document.getElementById("powerLimit");
                 var powerLimit = powerLimitInput.value;
-                for(var power = 1; power <= powerLimit; power++) {
-                    var size = Math.pow(2, power);
-                    var concatDuration = runConcatExperiment(size);
-                    var arrayJoinDuration = runArrayJoinExperiment(size);
-                    addRow(base, power, size, concatDuration, arrayJoinDuration);
-                }
+                var results = runExperiment(base, powerLimitInput, powerLimit);
+                results.forEach(function(result){
+                    addRow(result.base, result.power, result.size, result.concatDuration, result.arrayJoinDuration);
+                });
             }
         </script>
     </head>
     <body>
         <p>Calculate results for up to
             <input id="base" type="text" value="2"> to the power of <input id="powerLimit" type="text" value="26"> concats.
-            <button onclick="runExperiment()">Run!</button></p>
+            <button onclick="runBrowserExperiment()">Run!</button></p>
         <p>You might get a popup about the page being slow. You need to click wait. </p>
         <p>On Chrome Version 84.0.4147.89 (Official Build) (64-bit) I was able to do 2^26 before the browser ran out of memory. </p>
         <p>I even tried increasing the js heap limit and that did not help: https://bugs.chromium.org/p/v8/issues/detail?id=847 recommends opening chrome with  -args --js-flags="--max_old_space_size=8192"
