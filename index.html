@@ -2,7 +2,7 @@
     <head>
         <script src="experiment.js"></script>
         <script>
-            function addRow(base, power, size, concatDuration, arrayJoinDuration) {
+            function addRow(base, power, size, concatDuration, arrayJoinDuration, builderDuration) {
                 var resultsTable = document.getElementById("results");
                 var tableRow = document.createElement("tr");
                 var powerCell = document.createElement("td");
@@ -18,16 +18,21 @@
                 joinCell.innerText = arrayJoinDuration;
                 tableRow.append(joinCell);
                 resultsTable.appendChild(tableRow);
+                var builderCell  = document.createElement("td");
+                builderCell.innerText = builderDuration;
+                tableRow.append(builderCell);
+                resultsTable.appendChild(tableRow);
             }
             
             function runBrowserExperiment() {
                 var baseInput = document.getElementById("base");
-                var base = baseInput.value;
+                var base = parseInt(baseInput.value);
                 var powerLimitInput = document.getElementById("powerLimit");
-                var powerLimit = powerLimitInput.value;
+                var powerLimit = parseInt(powerLimitInput.value);
                 var results = runExperiment(base, powerLimit);
                 results.forEach(function(result){
-                    addRow(result.base, result.power, result.size, result.concatDuration, result.arrayJoinDuration);
+                    addRow(result.base, result.power, result.size,
+                        result.concatDuration, result.arrayJoinDuration, result.builderDuration);
                 });
             }
         </script>
@@ -50,6 +55,7 @@
                 <th># concats</th>
                 <th>String conat</th>
                 <th>Array.join</th>
+                <th>StringBuilder</th>
             </thead>
         </table>
     </body>
