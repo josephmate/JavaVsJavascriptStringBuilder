@@ -1,3 +1,16 @@
+function runRustBuilderExperiment(rustStringBuilderFunction, base, power, size) {
+    var builder = rustStringBuilderFunction();
+    var start = new Date().getTime();
+    for (var i = 0; i < size; i++) {
+        builder.append(""+(i%10));
+    }
+    var end = new Date().getTime();
+    var duration = end - start;
+    var result = builder.build();
+    console.log("rust builder %d^%d %d %d %d", base, power, size, result.length, duration);
+    return duration;
+}
+
 function StringBuilder() {
 
     // cannot use String.fromCharCode due to
@@ -93,21 +106,33 @@ function runArrayJoinExperiment(base, power, size) {
     return duration;
 }
 
-function runExperiment(base, powerLimit) {
+function runExperiment(base, powerLimit, builderLimit, rustStringBuilderFunction) {
     var results = [];
     for(var power = 1; power <= powerLimit; power++) {
         var size = Math.pow(base, power);
         var concatDuration = runConcatExperiment(base, power, size);
         var arrayJoinDuration = runArrayJoinExperiment(base, power, size);
-        var builderDuration = runBuilderExperiment(base, power, size);
-        results.push({
+
+        var result = {
             base: base,
             power: power, 
             size: size,
             concatDuration: concatDuration,
-            arrayJoinDuration: arrayJoinDuration,
-            builderDuration: builderDuration
-        });
+            arrayJoinDuration: arrayJoinDuration
+        };
+
+        if (!builderLimit || power <= builderLimit) {
+            var builderDuration = runBuilderExperiment(base, power, size);
+            result.builderDuration = builderDuration;
+        }
+
+        if (rustStringBuilderFunction !== undefined) {
+            var rustBuilderDuration = runRustBuilderExperiment(rustStringBuilderFunction, base, power, size);
+            result.rustBuilderDuration = rustBuilderDuration;
+        }
+
+
+        results.push(result);
     }
     return results;
 }

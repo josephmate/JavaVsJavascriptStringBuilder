@@ -1,3 +1,11 @@
+# java
 *.class
+
+# vim
 *~
+
+# nodeJS crash
 report.*.json
+
+# rust wasm
+target/
