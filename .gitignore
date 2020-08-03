@@ -9,3 +9,9 @@ report.*.json
 
 # rust wasm
 target/
+
+# unused wasm generated files
+pkg/README.md
+pkg/hello_world.d.ts
+pkg/hello_world_bg.d.ts
+pkg/package.json
