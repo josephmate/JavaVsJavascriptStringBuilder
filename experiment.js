@@ -1,16 +1,3 @@
-function runRustBuilderExperiment(rustStringBuilderFunction, base, power, size) {
-    var builder = rustStringBuilderFunction();
-    var start = new Date().getTime();
-    for (var i = 0; i < size; i++) {
-        builder.append(""+(i%10));
-    }
-    var end = new Date().getTime();
-    var duration = end - start;
-    var result = builder.build();
-    console.log("rust builder %d^%d %d %d %d", base, power, size, result.length, duration);
-    return duration;
-}
-
 function StringBuilder() {
 
     // cannot use String.fromCharCode due to
@@ -68,70 +55,89 @@ function StringBuilder() {
     }
 }
 
-function runBuilderExperiment(base, power, size) {
-    var builder = new StringBuilder();
-    var start = new Date().getTime();
-    for (var i = 0; i < size; i++) {
-        builder.append(""+(i%10));
-    }
-    var end = new Date().getTime();
-    var duration = end - start;
-    var result = builder.build();
-    console.log("builder %d^%d %d %d %d", base, power, size, result.length, duration);
-    return duration;
-}
-
-function runConcatExperiment(base, power, size) {
-    var result = "";
-    var start = new Date().getTime();
-    for (var i = 0; i < size; i++) {
-        result += (i%10);
-    }
-    var end = new Date().getTime();
-    var duration = end - start;
-    console.log("concat %d^%d %d %d %d", base, power, size, result.length, duration);
-    return duration;
-}
-
-function runArrayJoinExperiment(base, power, size) {
-    var builder = [];
-    var start = new Date().getTime();
-    for (var i = 0; i < size; i++) {
-        builder.push(i%10);
-    }
-    var result = builder.join("");
-    var end = new Date().getTime();
-    var duration = end - start;
-    console.log("join %d^%d %d %d %d", base, power, size, result.length, duration);
-    return duration;
-}
-
-function runExperiment(base, powerLimit, builderLimit, rustStringBuilderFunction) {
-    var results = [];
-    for(var power = 1; power <= powerLimit; power++) {
-        var size = Math.pow(base, power);
-        var concatDuration = runConcatExperiment(base, power, size);
-        var arrayJoinDuration = runArrayJoinExperiment(base, power, size);
-
-        var result = {
-            base: base,
-            power: power, 
-            size: size,
-            concatDuration: concatDuration,
-            arrayJoinDuration: arrayJoinDuration
-        };
-
-        if (!builderLimit || power <= builderLimit) {
-            var builderDuration = runBuilderExperiment(base, power, size);
-            result.builderDuration = builderDuration;
+const experiments = {
+    builder(base, power, size) {
+        var builder = new StringBuilder();
+        var start = new Date().getTime();
+        for (var i = 0; i < size; i++) {
+            builder.append(""+(i%10));
         }
-
-        if (rustStringBuilderFunction !== undefined) {
-            var rustBuilderDuration = runRustBuilderExperiment(rustStringBuilderFunction, base, power, size);
-            result.rustBuilderDuration = rustBuilderDuration;
+        var end = new Date().getTime();
+        var duration = end - start;
+        var result = builder.build();
+        console.log("builder %d^%d %d %d %d", base, power, size, result.length, duration);
+        return duration;
+    },
+    concat(base, power, size) {
+        var result = "";
+        var start = new Date().getTime();
+        for (var i = 0; i < size; i++) {
+            result += (i%10);
         }
+        var end = new Date().getTime();
+        var duration = end - start;
+        console.log("concat %d^%d %d %d %d", base, power, size, result.length, duration);
+        return duration;
+    },
+    arrayJoin(base, power, size) {
+        var builder = [];
+        var start = new Date().getTime();
+        for (var i = 0; i < size; i++) {
+            builder.push(i%10);
+        }
+        var result = builder.join("");
+        var end = new Date().getTime();
+        var duration = end - start;
+        console.log("join %d^%d %d %d %d", base, power, size, result.length, duration);
+        return duration;
+    },
+    rustBuilder(base, power, size) {
+        // The arguments have to be consistent with the others for this to work
+        // Using a global variable is the next best thing
+        var builder = _rustStringBuilderFunction();
+        var start = new Date().getTime();
+        for (var i = 0; i < size; i++) {
+            builder.append(""+(i%10));
+        }
+        var end = new Date().getTime();
+        var duration = end - start;
+        var result = builder.build();
+        console.log("rust builder %d^%d %d %d %d", base, power, size, result.length, duration);
+        return duration;
+    }
+};
 
+let _rustStringBuilderFunction;
 
+function runExperiment(options, rustStringBuilderFunction){
+    _rustStringBuilderFunction = rustStringBuilderFunction;
+    const defaultOptions = {
+        powerLimit:27,
+        base:2,
+    };
+    for(let key in defaultOptions){
+        if(!(key in options))options[key] = defaultOptions[key];
+    }
+
+    const results = [];
+    const timedOuts = new Set;
+    if(rustStringBuilderFunction === undefined)
+        timedOuts.add("rustBuilder");
+    for(let power = 1; power <= options.powerLimit; power++){
+        const size = Math.pow(options.base, power);
+        const result = {};
+        for(let expName in experiments){
+            if(timedOuts.has(expName))continue;
+            const limitName = expName+"Limit";
+            if(limitName in options){
+                if(power > options.limitName){
+                    timedOuts.add(expName);
+                    continue;
+                }
+            }
+            const duration = experiments[expName](options.base, power, size);
+            result[expName+"Duration"] = duration;
+        }
         results.push(result);
     }
     return results;
@@ -139,7 +145,7 @@ function runExperiment(base, powerLimit, builderLimit, rustStringBuilderFunction
 
 module.exports = {
     run: function (base, powerLimit) {
-        runExperiment(base, powerLimit);
+        runExperiment({base, powerLimit});
     }
 };
   
