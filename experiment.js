@@ -55,6 +55,53 @@ function StringBuilder() {
     }
 }
 
+const NODE_UTF16MAX = 1<<27-1;
+
+class FastStringBuilder{
+    u16 = new Uint16Array(512);
+    length = 0;
+    position = 0;
+    decoder = new TextDecoder("utf-16le");
+    reserve(end){
+        if(end <= this.u16.length){
+            if(end > this.length){
+                this.length = end;
+            }
+            return;
+        }
+        let len = this.u16.length;
+        while(len < this.length){
+            len *= 2;
+        }
+        const u16n = new Uint16Array(len);
+        u16n.set(this.u16);
+        this.u16 = u16n;
+        this.length = end;
+    }
+    append(str){
+        this.reserve(this.position+str.length);
+        let position = this.position;
+        for(let i = 0; i < str.length; i++){
+            this.u16[position++] = str.charCodeAt(i);
+        }
+        this.position = position;
+    }
+    toString(){
+        const len = this.length;
+        if(len < NODE_UTF16MAX){
+            return this.decoder.decode(this.u16.subarray(0,this.length));
+        }
+        let res = "";
+        let pos = 0;
+        while(len - pos > NODE_UTF16MAX){
+            res += this.decoder.decode(this.u16.subarray(pos,pos+NODE_UTF16MAX));
+            pos += NODE_UTF16MAX;
+        }
+        res += this.decoder.decode(this.u16.subarray(pos,len));
+        return res;
+    }
+}
+
 const experiments = {
     builder(base, power, size) {
         var builder = new StringBuilder();
@@ -66,6 +113,18 @@ const experiments = {
         var duration = end - start;
         var result = builder.build();
         console.log("builder %d^%d %d %d %d", base, power, size, result.length, duration);
+        return duration;
+    },
+    fastBuilder(base, power, size) {
+        var builder = new FastStringBuilder();
+        var start = new Date().getTime();
+        for (var i = 0; i < size; i++) {
+            builder.append(""+(i%10));
+        }
+        var end = new Date().getTime();
+        var duration = end - start;
+        var result = builder.toString();
+        console.log("fast-builder %d^%d %d %d %d", base, power, size, result.length, duration);
         return duration;
     },
     concat(base, power, size) {
