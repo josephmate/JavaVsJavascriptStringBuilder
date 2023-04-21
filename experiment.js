@@ -114,6 +114,7 @@ function runExperiment(options, rustStringBuilderFunction){
     const defaultOptions = {
         powerLimit:27,
         base:2,
+        timeout:2000 // cut off longer than 2000 ms
     };
     for(let key in defaultOptions){
         if(!(key in options))options[key] = defaultOptions[key];
@@ -136,6 +137,7 @@ function runExperiment(options, rustStringBuilderFunction){
                 }
             }
             const duration = experiments[expName](options.base, power, size);
+            if(duration > options.timeout)timedOuts.add(expName);
             result[expName+"Duration"] = duration;
         }
         results.push(result);
