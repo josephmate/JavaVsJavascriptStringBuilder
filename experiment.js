@@ -99,7 +99,7 @@ function runArrayJoinExperiment(base, power, size) {
     for (var i = 0; i < size; i++) {
         builder.push(i%10);
     }
-    var result = builder.join();
+    var result = builder.join("");
     var end = new Date().getTime();
     var duration = end - start;
     console.log("join %d^%d %d %d %d", base, power, size, result.length, duration);
